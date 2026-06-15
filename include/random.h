@@ -10,6 +10,6 @@
     ((float)(min) + ((float)((max) - (min))) * (rand() / (float)RAND_MAX))
 
 #define RAND_BOOL(probability) \
-    ((float)(probability) * (float)RAND_MAX > rand())
+    (((float)(rand() % 1000) / 1000.f) < (probability))
 
 #endif // RANDOM_H
