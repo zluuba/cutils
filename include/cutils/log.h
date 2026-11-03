@@ -105,7 +105,7 @@ inline static void log_flush(log_entry_context *ctx) {
 
 #ifndef LOG_PRI_PREFIX
 #define LOG_PRI_PREFIX(lvl)                                         \
-    PriFmt("%s "LOG_COLOR_LOCATION"%s:%zu %s():"LOG_COLOR_FATAL" ", \
+    PriFmt("%s "LOG_COLOR_LOCATION"%s:%zu %s():"LOG_COLOR_RESET" ", \
            log_level_to_str(lvl), __FILE__, __LINE__, __func__)
 #endif
 
@@ -146,7 +146,7 @@ inline static void log_flush(log_entry_context *ctx) {
 static inline log_entry_result log_entry(
     log_entry_context *ctx, const char *format, ...
 ) {
-    if (ctx->size > 0 && ctx->buf[ctx->size]) {
+    if (ctx->size > 0 && ctx->buf[ctx->size - 1] == '\0') {
         ctx->size--;
     }
     size_t remain_size = ctx->capacity - ctx->size;

@@ -1,3 +1,4 @@
+#define LOG_LVL LOG_LVL_TRACE
 #include "cutils/log.h"
 
 #include <assert.h>
