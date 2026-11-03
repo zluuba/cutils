@@ -42,6 +42,24 @@ void test_log_entry() {
     TEST_ASSERT_EQUAL_size_t(ctx.capacity, 10);
     TEST_ASSERT_EQUAL_size_t(ctx.size, 10);
     TEST_ASSERT_EQUAL_STRING(buf, "t...trunc");
+
+    ctx.size = 0;
+    ctx.capacity = 1024;
+    log_entry(&ctx, "too");
+    TEST_ASSERT_EQUAL_PTR(ctx.buf, buf);
+    TEST_ASSERT_EQUAL_size_t(ctx.capacity, 1024);
+    TEST_ASSERT_EQUAL_size_t(ctx.size, 4);
+    TEST_ASSERT_EQUAL_STRING(buf, "too");
+    log_entry(&ctx, "long");
+    TEST_ASSERT_EQUAL_PTR(ctx.buf, buf);
+    TEST_ASSERT_EQUAL_size_t(ctx.capacity, 1024);
+    TEST_ASSERT_EQUAL_size_t(ctx.size, 8);
+    TEST_ASSERT_EQUAL_STRING(buf, "toolong");
+    log_entry(&ctx, "log");
+    TEST_ASSERT_EQUAL_PTR(ctx.buf, buf);
+    TEST_ASSERT_EQUAL_size_t(ctx.capacity, 1024);
+    TEST_ASSERT_EQUAL_size_t(ctx.size, 11);
+    TEST_ASSERT_EQUAL_STRING(buf, "toolonglog");
 }
 
 int main() {

@@ -63,6 +63,7 @@ static enum log_level log_unit_log_level = LOG_LVL;
 
 static inline const char* log_level_to_str(enum log_level lvl) {
     switch (lvl) {
+        case LOG_LVL_TRACE: return LOG_COLOR_TRACE"[TRACE]"LOG_COLOR_RESET;
         case LOG_LVL_DEBUG: return LOG_COLOR_DEBUG"[DEBUG]"LOG_COLOR_RESET;
         case LOG_LVL_INFO:  return LOG_COLOR_INFO"[INFO]"LOG_COLOR_RESET;
         case LOG_LVL_WARN:  return LOG_COLOR_WARN"[WARN]"LOG_COLOR_RESET;
@@ -145,13 +146,16 @@ inline static void log_flush(log_entry_context *ctx) {
 static inline log_entry_result log_entry(
     log_entry_context *ctx, const char *format, ...
 ) {
-    va_list args;
-    va_start(args, format);
+    if (ctx->size > 0 && ctx->buf[ctx->size]) {
+        ctx->size--;
+    }
     size_t remain_size = ctx->capacity - ctx->size;
     if (!remain_size) {
         return (log_entry_result){};
     }
     char *buf_prt = ctx->buf + ctx->size;
+    va_list args;
+    va_start(args, format);
     ssize_t len = vsnprintf(ctx->buf + ctx->size, remain_size, format, args);
     va_end(args);
     if (len < 0) {

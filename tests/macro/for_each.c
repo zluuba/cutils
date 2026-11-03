@@ -27,7 +27,6 @@ void test_for_each() {
     val = 0;
     FOR_EACH(SET_BIT, 1, 3, 5, 7);
     TEST_ASSERT_EQUAL_INT(val, 0b10101010);
-    return 0;
 }
 
 int main() {
