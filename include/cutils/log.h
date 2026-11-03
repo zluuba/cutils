@@ -113,7 +113,7 @@ inline static void log_flush(log_entry_context *ctx) {
     log_entry_context *log_entry_context =    \
         LOG_GET_CONTEXT_FUNC();               \
     LOG_PRI_PREFIX(lvl);                      \
-    for_each(__log_entry, ##__VA_ARGS__)      \
+    FOR_EACH(__log_entry, ##__VA_ARGS__)      \
     LOG_FLUSH_FUNC(log_entry_context);        \
 } while (0)
 
