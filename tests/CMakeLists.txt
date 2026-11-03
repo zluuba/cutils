@@ -8,7 +8,7 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
 
     add_executable(${TEST_NAME} ${TEST_SOURCE})
     target_include_directories(
-        ${TEST_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include/cutils
+        ${TEST_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include
     )
     target_link_libraries(${TEST_NAME} PRIVATE unity)
 

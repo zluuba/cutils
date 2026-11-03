@@ -1,4 +1,4 @@
-#include "macro/math.h"
+#include "cutils/macro/math.h"
 
 #include <assert.h>
 #include "unity.h"
@@ -15,7 +15,6 @@ void test_math_mod() {
     TEST_ASSERT_EQUAL_INT(val, 1);
     val = MATH_MOD(0, 3);
     TEST_ASSERT_EQUAL_INT(val, 0);
-    return 0;
 }
 
 void test_max() {
@@ -23,7 +22,6 @@ void test_max() {
     TEST_ASSERT_EQUAL_INT(val, 10);
     val = MAX(3, 10);
     TEST_ASSERT_EQUAL_INT(val, 10);
-    return 0;
 }
 
 void test_min() {
@@ -31,7 +29,6 @@ void test_min() {
     TEST_ASSERT_EQUAL_INT(val, 3);
     val = MIN(3, 10);
     TEST_ASSERT_EQUAL_INT(val, 3);
-    return 0;
 }
 
 int main() {
