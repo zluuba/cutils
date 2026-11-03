@@ -17,14 +17,24 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 endif()
 
 set(SOURCES
-    ./src/log.c
-    ./src/mem.c
+    # ./src/mem.c
 )
 
-add_library(cutils STATIC ${SOURCES})
-target_include_directories(cutils PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+# add_library(cutils STATIC ${SOURCES})
+# target_include_directories(cutils PUBLIC
+#     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#     $<INSTALL_INTERFACE:include>
+# )
+# target_include_directories(cutils PRIVATE src)
+# target_compile_options(cutils PRIVATE ${CFLAGS})
+
+add_library(unity STATIC
+    third_party/Unity/src/unity.c
 )
-target_include_directories(cutils PRIVATE src)
-target_compile_options(cutils PRIVATE ${CFLAGS})
+
+target_include_directories(unity PUBLIC
+    third_party/Unity/src
+)
+
+enable_testing()
+add_subdirectory(tests)
