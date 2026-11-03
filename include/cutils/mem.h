@@ -1,7 +1,7 @@
 #ifndef MEM_H
 #define MEM_H
 
-#include "location.h"
+#include "cutils/location.h"
 
 #include <stdlib.h>
 
