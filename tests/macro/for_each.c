@@ -7,7 +7,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-void test_for_each() {
+void test_for_each(void) {
     #define MY_ASSERT(arg) TEST_ASSERT(arg);
     FOR_EACH(MY_ASSERT);
     FOR_EACH(MY_ASSERT, true);
@@ -29,7 +29,7 @@ void test_for_each() {
     TEST_ASSERT_EQUAL_INT(val, 0b10101010);
 }
 
-int main() {
+int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_for_each);
     return UNITY_END();

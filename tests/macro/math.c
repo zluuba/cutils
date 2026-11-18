@@ -6,7 +6,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-void test_math_mod() {
+void test_math_mod(void) {
     int val = MATH_MOD(10, 3);
     TEST_ASSERT_EQUAL_INT(val, 1);
     val = MATH_MOD(2, 3);
@@ -17,21 +17,21 @@ void test_math_mod() {
     TEST_ASSERT_EQUAL_INT(val, 0);
 }
 
-void test_max() {
+void test_max(void) {
     int val = MAX(10, 3);
     TEST_ASSERT_EQUAL_INT(val, 10);
     val = MAX(3, 10);
     TEST_ASSERT_EQUAL_INT(val, 10);
 }
 
-void test_min() {
+void test_min(void) {
     int val = MIN(10, 3);
     TEST_ASSERT_EQUAL_INT(val, 3);
     val = MIN(3, 10);
     TEST_ASSERT_EQUAL_INT(val, 3);
 }
 
-int main() {
+int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_math_mod);
     RUN_TEST(test_max);

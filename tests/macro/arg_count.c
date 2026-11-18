@@ -15,7 +15,7 @@ void test_arg_count(void) {
     TEST_ASSERT (ARG_COUNT_IS_0(false, true, 0));
 }
 
-int main() {
+int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_arg_count);
     return UNITY_END();

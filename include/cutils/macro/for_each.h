@@ -107,6 +107,12 @@
 
 #define _FOR_EACH_N2(m, cnt, ...) _FOR_EACH_##cnt(m, ##__VA_ARGS__)
 #define _FOR_EACH_N(m, cnt, ...) _FOR_EACH_N2(m, cnt, ##__VA_ARGS__)
+
+/**
+ * Applies a macro to each variadic argument.
+ * @param m Macro to invoke for each argument.
+ * @param ... Arguments passed to `m`, one at a time.
+ */
 #define FOR_EACH(m, ...) _FOR_EACH_N(m, ARG_COUNT(__VA_ARGS__), ##__VA_ARGS__)
 
 #endif // INCLUDE_CUTILS_MACRO_FOR_EACH

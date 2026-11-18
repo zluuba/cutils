@@ -14,6 +14,15 @@
     _90, _91, _92, _93, _94, _95, _96, _97, _98, _99, \
     _100, cnt, ...) cnt
 
+/**
+ * Returns the number of arguments passed to a variadic macro.
+ *
+ * The macro supports up to 100 arguments and expands to the corresponding
+ * count value.
+ *
+ * @param ... Variadic arguments whose count should be evaluated.
+ * @return Number of arguments in the variadic list.
+ */
 #define ARG_COUNT(...) _ARG_COUNT(_, ##__VA_ARGS__, \
     100, 99, 98, 97, 96, 95, 94, 93, 92, 91,        \
      90, 89, 88, 87, 86, 85, 84, 83, 82, 81,        \
@@ -26,6 +35,14 @@
      20, 19, 18, 17, 16, 15, 14, 13, 12, 11,        \
      10,  9,  8,  7,  6,  5,  4,  3,  2,  1, 0)
 
+/**
+ * Selects one of two tokens depending on whether the argument count is zero.
+ *
+ * @param Y Token to expand when the argument count is zero.
+ * @param N Token to expand when the argument count is non-zero.
+ * @param ... Variadic arguments whose count is examined.
+ * @return Either `Y` or `N` depending on whether no arguments were supplied.
+ */
 #define ARG_COUNT_IS_0(Y, N, ...) _ARG_COUNT(_, ##__VA_ARGS__, \
     N, N, N, N, N, N, N, N, N, N,                              \
     N, N, N, N, N, N, N, N, N, N,                              \

@@ -52,6 +52,8 @@ static enum log_level log_unit_log_level = LOG_LVL;
 #define log_custom_log_entry(func, ...) \
     log_entry_result func(log_entry_context *log_entry_context, ##__VA_ARGS__)
 
+#define LOG_PRI_RET_VAL (log_entry_result){}
+
 #define LOG_COLOR_TRACE    "\033[37m"
 #define LOG_COLOR_DEBUG    "\033[32m"
 #define LOG_COLOR_INFO     "\033[34m"
@@ -69,6 +71,7 @@ static inline const char* log_level_to_str(enum log_level lvl) {
         case LOG_LVL_WARN:  return LOG_COLOR_WARN"[WARN]"LOG_COLOR_RESET;
         case LOG_LVL_ERROR: return LOG_COLOR_ERROR"[ERROR]"LOG_COLOR_RESET;
         case LOG_LVL_FATAL: return LOG_COLOR_FATAL"[FATAL]"LOG_COLOR_RESET;
+        default:
     }
     return LOG_COLOR_FATAL"[UNKNOWN]"LOG_COLOR_RESET;
 }
@@ -85,13 +88,15 @@ typedef struct _log_entry_context {
 
 #ifndef LOG_GET_CONTEXT_FUNC
 #define LOG_BUFFER_LEN 1024
-inline static log_entry_context* log_get_context() {
+inline static log_entry_context* log_get_context(void) {
     static char buf[LOG_BUFFER_LEN];
-    static log_entry_context log_entry_context = {};
-    log_entry_context.buf = buf;
-    log_entry_context.size = 0;
-    log_entry_context.capacity = LOG_BUFFER_LEN;
-    return &log_entry_context;
+    static log_entry_context ctx;
+    ctx = (log_entry_context) {
+        .buf = buf,
+        .size = 0,
+        .capacity = LOG_BUFFER_LEN
+    };
+    return &ctx;
 }
 #define LOG_GET_CONTEXT_FUNC log_get_context
 #endif
@@ -137,6 +142,7 @@ inline static void log_flush(log_entry_context *ctx) {
         long double:        PriLongDouble(entry),       \
         const char *:       PriStr(entry),              \
         char *:             PriStr(entry),              \
+        void *:             PriPtr(entry),              \
         log_entry_result: entry                         \
     );                                                  \
 } while(0);
@@ -153,18 +159,17 @@ static inline log_entry_result log_entry(
     if (!remain_size) {
         return (log_entry_result){};
     }
-    char *buf_prt = ctx->buf + ctx->size;
     va_list args;
     va_start(args, format);
-    ssize_t len = vsnprintf(ctx->buf + ctx->size, remain_size, format, args);
+    int len = vsnprintf(ctx->buf + ctx->size, remain_size, format, args);
     va_end(args);
     if (len < 0) {
         ctx->buf[ctx->size] = '\0';
         return (log_entry_result){};
     }
-    len++; // include '\0'
-    if (len > remain_size) {
-        len = remain_size;
+    size_t ulen = (size_t)len + 1; // include '\0'
+    if (ulen > remain_size) {
+        ulen = remain_size;
         char *buf_end = ctx->buf + ctx->capacity;
         *buf_end = '\0';
         if (ctx->capacity >= LOG_TRUNCATED_LOG_SUFFIX_SIZE) {
@@ -173,7 +178,7 @@ static inline log_entry_result log_entry(
             memcpy(buf_end - suffix_size, suffix, suffix_size);
         }
     }
-    ctx->size += len;
+    ctx->size += ulen;
     return (log_entry_result){};
 }
 
