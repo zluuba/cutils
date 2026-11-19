@@ -30,16 +30,69 @@
 
 /**
  * Execute `code` when `condition` is true and optionally log an error.
+ * The macro is not wrapped in a loop. This means you can use `break` or
+ * `continue` within the `code` block. However, the compiler will not flag the
+ * absence of a semicolon after the macro invocation as an error, and you
+ * cannot use this macro within an `if-else` block without curly braces `{}`
+ * (even if a semicolon is present).
+ *
+ * Example:
+ * ```c
+ * not_wrapped_do_if(true, abort(), "Error happen");
+ * not_wrapped_do_if(true, abort(), "Error happen") // no ;
+ *
+ * if (true)
+ *     not_wrapped_do_if(true, abort(), "Error happen")
+ * else
+ *     not_wrapped_do_if(true, abort(), "Error happen")
+ *
+ * if (true) {
+ *     not_wrapped_do_if(true, abort(), "Error happen");
+ * } else {
+ *     not_wrapped_do_if(true, abort(), "Error happen");
+ * }
+ *
+ * // Compile error
+ * if (true)
+ *     not_wrapped_do_if(true, abort(), "Error happen");
+ * else
+ *     not_wrapped_do_if(true, abort(), "Error happen");
+ * ```
  * @param condition Condition to check.
- * @param code Statement(s) to run when the condition is true.
+ * @param code Statement to run when the condition is true.
  * @param ... Optional log format string and arguments passed to `log_error`.
  */
-#define do_if(condition, code, ...) {                            \
+#define not_wrapped_do_if(condition, code, ...) {                \
     if (condition) {                                             \
         ARG_COUNT_IS_0(, log_error(__VA_ARGS__), ##__VA_ARGS__); \
         code;                                                    \
     }                                                            \
 }
+
+/**
+ * Execute `code` when `condition` is true and optionally log an error.
+ * The macro is wrapped in a loop, which means you cannot use `break` or
+ * `continue` within the `code` block; however, the compiler requires a
+ * semicolon (`;`) after the macro invocation.
+ *
+ * Example:
+ * ```c
+ * do_if(true, abort(), "Error happen");
+ *
+ * if (true)
+ *     do_if(true, abort(), "Error happen");
+ * else
+ *     do_if(true, abort(), "Error happen");
+ *
+ * // Compile error
+ * do_if(true, abort(), "Error happen")
+ * ```
+ * @param condition Condition to check.
+ * @param code Statement to run when the condition is true.
+ * @param ... Optional log format string and arguments passed to `log_error`.
+ */
+#define do_if(condition, code, ...) \
+    do not_wrapped_do_if(condition, code, ##__VA_ARGS__) while(0)
 
 /**
  * Convenience wrapper around `do_if(cond, , ...)` for logging-only checks.
@@ -51,7 +104,7 @@
 /**
  * Return `val` after executing `code` when `cond` is true.
  * @param cond Condition to check.
- * @param code Statement(s) to run before returning.
+ * @param code Statement to run before returning.
  * @param val Value to return.
  * @param ... Optional log format string and arguments.
  */
@@ -60,7 +113,7 @@
 
 /**
  * Return `val` after executing `code` unconditionally.
- * @param code Statement(s) to run before returning.
+ * @param code Statement to run before returning.
  * @param val Value to return.
  * @param ... Optional log format string and arguments.
  */
@@ -69,7 +122,7 @@
 /**
  * Return `-1` after executing `code` when `cond` is true.
  * @param cond Condition to check.
- * @param code Statement(s) to run before returning.
+ * @param code Statement to run before returning.
  * @param ... Optional log format string and arguments.
  */
 #define ret_err_do_if(cond, code, ...) \
@@ -77,7 +130,7 @@
 
 /**
  * Return `-1` after executing `code` unconditionally.
- * @param code Statement(s) to run before returning.
+ * @param code Statement to run before returning.
  * @param ... Optional log format string and arguments.
  */
 #define ret_err_do(code, ...) ret_val_do(code, -1, ##__VA_ARGS__)
@@ -85,14 +138,14 @@
 /**
  * Return without a value after executing `code` when `cond` is true.
  * @param cond Condition to check.
- * @param code Statement(s) to run before returning.
+ * @param code Statement to run before returning.
  * @param ... Optional log format string and arguments.
  */
 #define ret_do_if(cond, code, ...) ret_val_do_if(cond, code,, ##__VA_ARGS__)
 
 /**
  * Return without a value after executing `code` unconditionally.
- * @param code Statement(s) to run before returning.
+ * @param code Statement to run before returning.
  * @param ... Optional log format string and arguments.
  */
 #define ret_do(code, ...) ret_val_do(code,, ##__VA_ARGS__)
@@ -140,22 +193,25 @@
 
 /**
  * Break from the current loop after executing `code` when `cond` is true.
+ * Based on `not_wrapped_do_if`; read about its limitations.
  * @param cond Condition to check.
- * @param code Statement(s) to run before breaking.
+ * @param code Statement to run before breaking.
  * @param ... Optional log format string and arguments.
  */
 #define break_do_if(cond, code, ...) \
-    do_if(cond, { code; break; }, ##__VA_ARGS__)
+    not_wrapped_do_if(cond, { code; break; }, ##__VA_ARGS__)
 
 /**
  * Break from the current loop after executing `code` unconditionally.
- * @param code Statement(s) to run before breaking.
+ * Based on `not_wrapped_do_if`; read about its limitations.
+ * @param code Statement to run before breaking.
  * @param ... Optional log format string and arguments.
  */
 #define break_do(code, ...) break_do_if(1, code, ##__VA_ARGS__)
 
 /**
  * Break from the current loop when `cond` is true.
+ * Based on `not_wrapped_do_if`; read about its limitations.
  * @param cond Condition to check.
  * @param ... Optional log format string and arguments.
  */
@@ -163,28 +219,32 @@
 
 /**
  * Break from the current loop unconditionally.
+ * Based on `not_wrapped_do_if`; read about its limitations.
  * @param ... Optional log format string and arguments.
  */
 #define break_(...) break_if(1, ##__VA_ARGS__)
 
 /**
  * Continue the current loop after executing `code` when `cond` is true.
+ * Based on `not_wrapped_do_if`; read about its limitations.
  * @param cond Condition to check.
- * @param code Statement(s) to run before continuing.
+ * @param code Statement to run before continuing.
  * @param ... Optional log format string and arguments.
  */
 #define continue_do_if(cond, code, ...) \
-    do_if(cond, { code; continue; }, ##__VA_ARGS__)
+    not_wrapped_do_if(cond, { code; continue; }, ##__VA_ARGS__)
 
 /**
  * Continue the current loop after executing `code` unconditionally.
- * @param code Statement(s) to run before continuing.
+ * Based on `not_wrapped_do_if`; read about its limitations.
+ * @param code Statement to run before continuing.
  * @param ... Optional log format string and arguments.
  */
 #define continue_do(code, ...) continue_do_if(1, code, ##__VA_ARGS__)
 
 /**
  * Continue the current loop when `cond` is true.
+ * Based on `not_wrapped_do_if`; read about its limitations.
  * @param cond Condition to check.
  * @param ... Optional log format string and arguments.
  */
@@ -192,24 +252,25 @@
 
 /**
  * Continue the current loop unconditionally.
+ * Based on `not_wrapped_do_if`; read about its limitations.
  * @param ... Optional log format string and arguments.
  */
 #define continue_(...) continue_if(1, ##__VA_ARGS__)
 
-#define abort_progarm_func() abort()
+#define abort_program_func() abort()
 
 /**
  * Abort the process after executing `code` when `cond` is true.
  * @param cond Condition to check.
- * @param code Statement(s) to run before aborting.
+ * @param code Statement to run before aborting.
  * @param ... Optional log format string and arguments.
  */
 #define abort_do_if(cond, code, ...) \
-    do_if(cond, { code; abort_progarm_func(); }, ##__VA_ARGS__)
+    do_if(cond, { code; abort_program_func(); }, ##__VA_ARGS__)
 
 /**
  * Abort the process after executing `code` unconditionally.
- * @param code Statement(s) to run before aborting.
+ * @param code Statement to run before aborting.
  * @param ... Optional log format string and arguments.
  */
 #define abort_do(code, ...) abort_do_if(1, code, ##__VA_ARGS__)
